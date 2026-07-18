@@ -57,6 +57,7 @@ export default function SignUpPage() {
         className="relative grid w-full max-w-[min(64rem,calc(100vw-3rem))] max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[2.5rem] shadow-2xl lg:grid-cols-2"
       >
         <div className="flex flex-col justify-center bg-gradient-to-b from-orange-50 to-amber-50 px-8 py-8 sm:px-12">
+          <div className="mx-auto w-full max-w-sm">
           <div className="flex items-center justify-between gap-2">
             <Link to="/" className="flex items-center gap-2">
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 text-sm font-bold text-white">
@@ -162,6 +163,7 @@ export default function SignUpPage() {
               Sign in
             </MotionLink>
           </p>
+          </div>
         </div>
 
         <div className="relative hidden flex-col justify-between bg-white p-10 lg:flex">
