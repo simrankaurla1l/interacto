@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChatBubbleIcon, PersonIcon, PlusIcon, SpeakerLoudIcon, ArrowUpIcon } from '@radix-ui/react-icons';
+import { ChatBubbleIcon, PersonIcon, ArrowUpIcon } from '@radix-ui/react-icons';
 import Reveal from './Reveal.js';
 
 type NodeKey = 'start' | 'presentations' | 'surveys' | 'quizzes' | 'accounts' | 'pricing';
@@ -161,14 +161,6 @@ export default function ChatWidget({ className = 'relative mx-auto max-w-xl' }: 
         </div>
 
         <div className="flex items-center gap-2 border-t border-slate-100 px-5 py-3">
-          <button
-            type="button"
-            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100"
-            aria-label="Add attachment"
-          >
-            <PlusIcon className="h-4 w-4" />
-          </button>
-
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
             {currentOptions.map((option) => (
               <motion.button
@@ -185,13 +177,6 @@ export default function ChatWidget({ className = 'relative mx-auto max-w-xl' }: 
           </div>
 
           <div className="flex flex-shrink-0 items-center gap-2">
-            <button
-              type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100"
-              aria-label="Voice input"
-            >
-              <SpeakerLoudIcon className="h-4 w-4" />
-            </button>
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-400 text-white shadow-md">
               <ArrowUpIcon className="h-4 w-4" />
             </span>

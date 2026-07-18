@@ -39,10 +39,6 @@ export default function AssistantLauncher() {
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="fixed bottom-24 right-6 z-50 w-[calc(100vw-3rem)] max-w-md"
           >
-            <div className="mb-2 text-center">
-              <h3 className="text-sm font-semibold text-slate-900">Interacto Assistant</h3>
-              <p className="mt-0.5 text-xs text-slate-500">No forms, no waiting — pick an option and get a straight answer.</p>
-            </div>
             <ChatWidget className="relative w-full" />
           </motion.div>
         ) : null}

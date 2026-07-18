@@ -11,7 +11,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function TermsOfServicePage() {
   return (
-    <LegalPageLayout title="Terms of Service" updated="July 2026">
+    <LegalPageLayout title="Terms of Service" updated="July 2026" theme="orange">
       <Section title="Using Interacto">
         <p>
           By creating an account or using Interacto to build presentations, surveys, or quizzes, you agree to

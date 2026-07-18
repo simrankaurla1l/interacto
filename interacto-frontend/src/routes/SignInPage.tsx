@@ -39,7 +39,7 @@ export default function SignInPage() {
 
   return (
     <div
-      className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden p-6"
       style={{
         background:
           'radial-gradient(circle at 12% 10%, rgba(251,146,60,0.2) 0%, transparent 45%), radial-gradient(circle at 88% 20%, rgba(251,191,36,0.2) 0%, transparent 45%), #ffffff'
@@ -52,7 +52,7 @@ export default function SignInPage() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="relative grid w-full max-w-5xl overflow-hidden rounded-[2.5rem] shadow-2xl lg:grid-cols-2"
+        className="relative grid w-full max-w-[min(64rem,calc(100vw-3rem))] max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[2.5rem] shadow-2xl lg:grid-cols-2"
       >
         <div className="bg-gradient-to-b from-orange-50 to-amber-50 px-8 py-12 sm:px-12">
           <Link to="/" className="flex items-center gap-2">

@@ -60,7 +60,7 @@ export default function QuizWizard({ open, onClose }: QuizWizardProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-8 shadow-2xl"
+            className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl sm:p-8"
           >
             <div
               className="pointer-events-none absolute inset-0 -z-10"
@@ -117,7 +117,7 @@ export default function QuizWizard({ open, onClose }: QuizWizardProps) {
                   placeholder="E.g. test geography knowledge"
                 />
               </label>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className="block space-y-2 text-sm font-medium text-slate-700">
                   <span>Number of questions</span>
                   <input

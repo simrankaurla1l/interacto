@@ -58,7 +58,7 @@ export default function PresentPage() {
         <Cross2Icon className="h-4 w-4" />
       </button>
 
-      <div className="flex flex-1 items-center justify-center p-10">
+      <div className="flex flex-1 items-center justify-center p-4 sm:p-10">
         {loading ? (
           <p className="text-slate-400">Loading presentation…</p>
         ) : error ? (

@@ -106,7 +106,7 @@ export default function QuizJoinPage() {
   if (phase === 'name') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-        <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
           <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Room {roomCode}</p>
           <h1 className="mt-2 text-xl font-semibold text-slate-900">Join the quiz</h1>
           {error ? <p className="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</p> : null}
@@ -134,7 +134,7 @@ export default function QuizJoinPage() {
   if (phase === 'lobby') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-        <div className="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
+        <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200 sm:p-8">
           <h1 className="text-xl font-semibold text-slate-900">You're in!</h1>
           <p className="mt-2 text-sm text-slate-500">Waiting for the host to start the quiz…</p>
         </div>
@@ -145,7 +145,7 @@ export default function QuizJoinPage() {
   if ((phase === 'question' || phase === 'waiting') && question) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-        <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
           <p className="text-sm font-medium text-slate-400">
             Question {question.index + 1} of {question.total}
           </p>
@@ -184,7 +184,7 @@ export default function QuizJoinPage() {
 
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-        <div className="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
+        <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-200 sm:p-8">
           <h1 className="text-xl font-semibold text-slate-900">Quiz finished!</h1>
           {me ? (
             <>

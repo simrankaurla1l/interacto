@@ -16,6 +16,7 @@ import {
   Link2Icon,
   Pencil1Icon,
   PieChartIcon,
+  RowsIcon,
   PlusIcon,
   Share1Icon,
   TextIcon,
@@ -200,7 +201,8 @@ export default function PresentationEditorPage() {
   const [imageSearchOpen, setImageSearchOpen] = useState(false);
   const [seedTitleHtml, setSeedTitleHtml] = useState('');
   const [seedContentHtml, setSeedContentHtml] = useState('');
-  const [panelOpen, setPanelOpen] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches);
+  const [slidesOpen, setSlidesOpen] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches);
   const [titlePos, setTitlePos] = useState<SlidePosition>(DEFAULT_TITLE_POSITION);
   const [contentPos, setContentPos] = useState<SlidePosition>(DEFAULT_CONTENT_POSITION);
   const [imagePos, setImagePos] = useState<SlidePosition>(DEFAULT_IMAGE_POSITION);
@@ -216,6 +218,7 @@ export default function PresentationEditorPage() {
   const canvasRef = useRef<HTMLDivElement>(null);
   const slideAreaRef = useRef<HTMLDivElement>(null);
   const [slideSize, setSlideSize] = useState<{ width: number; height: number } | null>(null);
+  const [contentAutoTop, setContentAutoTop] = useState<number | null>(null);
   const dragStateRef = useRef<{
     target: DragTarget;
     startX: number;
@@ -613,6 +616,30 @@ export default function PresentationEditorPage() {
   }, []);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+    const title = titleRef.current;
+    if (!canvas || !title) {
+      setContentAutoTop(null);
+      return;
+    }
+
+    const updateAutoTop = () => {
+      if (draggingTarget === 'content') return;
+      const canvasRect = canvas.getBoundingClientRect();
+      const titleRect = title.getBoundingClientRect();
+      if (canvasRect.height <= 0) return;
+      const titleBottomPercent = ((titleRect.bottom - canvasRect.top) / canvasRect.height) * 100 + 4;
+      setContentAutoTop(titleBottomPercent > contentPos.y ? titleBottomPercent : null);
+    };
+
+    updateAutoTop();
+    const observer = new ResizeObserver(updateAutoTop);
+    observer.observe(title);
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, [selectedSlideIndex, seedTitleHtml, titlePos, contentPos.y, slideSize, draggingTarget]);
+
+  useEffect(() => {
     if (!selectedSlide || !dirty) return;
 
     if (autosaveTimerRef.current) {
@@ -671,16 +698,24 @@ export default function PresentationEditorPage() {
       }}
     >
       {/* Top bar */}
-      <header className="flex h-16 items-center gap-4 border-b border-orange-300 bg-gradient-to-r from-orange-200 via-orange-100 to-amber-100 px-4">
+      <header className="flex h-16 items-center gap-1 border-b border-orange-300 bg-gradient-to-r from-orange-200 via-orange-100 to-amber-100 px-2 sm:gap-4 sm:px-4">
         <Link to="/dashboard" className="rounded-full p-2 text-slate-900 transition hover:bg-orange-50 hover:text-orange-600">
           <ArrowLeftIcon className="h-5 w-5" />
         </Link>
 
-        <div className="min-w-0">
-          <h1 className="truncate text-base font-semibold leading-tight">
+        <button
+          onClick={() => setSlidesOpen(true)}
+          className="rounded-full p-2 text-slate-900 transition hover:bg-orange-50 hover:text-orange-600 lg:hidden"
+          title="Slides"
+        >
+          <RowsIcon className="h-5 w-5" />
+        </button>
+
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-sm font-semibold leading-tight sm:text-base">
             {presentation?.title || 'Untitled presentation'}
           </h1>
-          <p className="flex items-center gap-1 text-xs text-slate-400">My presentations</p>
+          <p className="hidden items-center gap-1 text-xs text-slate-400 sm:flex">My presentations</p>
         </div>
 
         {(settingsOpen || shareOpen) ? (
@@ -791,25 +826,41 @@ export default function PresentationEditorPage() {
           </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex flex-shrink-0 items-center gap-3">
           <Link
             to={`/present/${presentationId}`}
-            className="rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-105"
+            className="rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-105 sm:px-4 sm:py-2 sm:text-sm"
           >
-            Start presentation
+            <span className="sm:hidden">Start</span>
+            <span className="hidden sm:inline">Start presentation</span>
           </Link>
         </div>
       </header>
 
       <div className="flex" style={{ height: 'calc(100vh - 4rem)' }}>
         {/* Slide list */}
-        <aside className="w-60 shrink-0 overflow-y-auto border-r border-orange-200 bg-orange-100 px-3 py-4">
-          <button
-            onClick={() => setAddingSlide(!addingSlide)}
-            className="mx-auto mb-4 block w-auto rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-105"
-          >
-            {addingSlide ? 'Cancel' : '+ New slide'}
-          </button>
+        {slidesOpen ? (
+          <>
+            <div
+              className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
+              onClick={() => setSlidesOpen(false)}
+            />
+            <aside className="fixed inset-y-0 left-0 z-40 w-full max-w-xs overflow-y-auto border-r border-orange-200 bg-orange-100 px-3 py-4 shadow-2xl lg:static lg:z-auto lg:w-60 lg:max-w-none lg:shadow-none">
+              <div className="mb-3 flex items-center justify-between lg:hidden">
+                <span className="text-sm font-semibold text-slate-900">Slides</span>
+                <button
+                  onClick={() => setSlidesOpen(false)}
+                  className="rounded-full p-1.5 text-slate-500 hover:bg-orange-200"
+                >
+                  <Cross2Icon className="h-4 w-4" />
+                </button>
+              </div>
+              <button
+                onClick={() => setAddingSlide(!addingSlide)}
+                className="mx-auto mb-4 block w-auto rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-105"
+              >
+                {addingSlide ? 'Cancel' : '+ New slide'}
+              </button>
 
           {addingSlide ? (
             <div className="mb-4 space-y-3 rounded-2xl border border-orange-100 bg-orange-50/40 p-3">
@@ -892,7 +943,9 @@ export default function PresentationEditorPage() {
               })}
             </div>
           )}
-        </aside>
+            </aside>
+          </>
+        ) : null}
 
         {/* Canvas */}
         <main className="flex flex-1 items-center justify-center overflow-hidden bg-gradient-to-br from-orange-100 to-amber-50 p-4">
@@ -919,7 +972,8 @@ export default function PresentationEditorPage() {
                     backgroundColor: slideBgColor,
                     width: slideSize ? `${slideSize.width}px` : '100%',
                     height: slideSize ? `${slideSize.height}px` : undefined,
-                    aspectRatio: slideSize ? undefined : '16 / 9'
+                    aspectRatio: slideSize ? undefined : '16 / 9',
+                    containerType: 'inline-size'
                   }}
                 >
                 <div className="absolute right-6 top-5 flex items-center gap-1.5 text-xs font-medium text-slate-400">
@@ -952,13 +1006,13 @@ export default function PresentationEditorPage() {
                       setEditedTitle(event.currentTarget.innerHTML);
                       setDirty(true);
                     }}
-                    className="rich-text text-4xl font-semibold leading-tight text-slate-900 outline-none"
+                    className="rich-text text-[clamp(1.1rem,6cqw,2.25rem)] font-semibold leading-tight text-slate-900 outline-none"
                   />
                 </div>
 
                 <div
                   className="absolute max-w-[70%] cursor-text"
-                  style={{ left: `${contentPos.x}%`, top: `${contentPos.y}%` }}
+                  style={{ left: `${contentPos.x}%`, top: `${contentAutoTop ?? contentPos.y}%` }}
                 >
                   <button
                     onPointerDown={(event) => handleDragStart(event, 'content')}
@@ -982,7 +1036,7 @@ export default function PresentationEditorPage() {
                       setEditedContent(event.currentTarget.innerHTML);
                       setDirty(true);
                     }}
-                    className="rich-text whitespace-pre-wrap text-base text-slate-600 outline-none"
+                    className="rich-text whitespace-pre-wrap text-[clamp(0.8rem,3cqw,1rem)] text-slate-600 outline-none"
                   />
                 </div>
 
@@ -1085,7 +1139,12 @@ export default function PresentationEditorPage() {
 
         {/* Edit panel */}
         {panelOpen ? (
-          <aside className="w-80 shrink-0 overflow-y-auto border-l border-orange-200 bg-orange-100 px-5 py-4">
+          <>
+            <div
+              className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
+              onClick={() => setPanelOpen(false)}
+            />
+            <aside className="fixed inset-y-0 right-0 z-40 w-full max-w-xs overflow-y-auto border-l border-orange-200 bg-orange-100 px-5 py-4 shadow-2xl lg:static lg:z-auto lg:w-80 lg:max-w-none lg:shadow-none">
             <div className="flex items-center justify-between">
               <h2 className="text-base font-semibold">Edit</h2>
               <button onClick={() => setPanelOpen(false)} className="rounded-full p-1 text-slate-400 hover:bg-slate-100">
@@ -1284,7 +1343,8 @@ export default function PresentationEditorPage() {
                 </div>
               )}
             </div>
-          </aside>
+            </aside>
+          </>
         ) : null}
       </div>
 

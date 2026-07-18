@@ -9,6 +9,8 @@ import {
   Cross2Icon,
   DotsHorizontalIcon,
   Link2Icon,
+  Pencil1Icon,
+  RowsIcon,
   Share1Icon,
   TrashIcon
 } from '@radix-ui/react-icons';
@@ -36,6 +38,8 @@ export default function SurveyEditorPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
   const [saveFeedback, setSaveFeedback] = useState(false);
+  const [questionsOpen, setQuestionsOpen] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches);
+  const [editPanelOpen, setEditPanelOpen] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches);
   const autosaveTimerRef = useRef<number | null>(null);
 
   const selectedQuestion = survey?.questions[selectedIndex];
@@ -199,19 +203,33 @@ export default function SurveyEditorPage() {
           'radial-gradient(circle at 8% 0%, rgba(251,146,60,0.08) 0%, transparent 40%), radial-gradient(circle at 92% 0%, rgba(251,191,36,0.08) 0%, transparent 40%), #f8fafc'
       }}
     >
-      <header className="flex h-16 items-center gap-4 border-b border-orange-300 bg-gradient-to-r from-orange-200 via-orange-100 to-amber-100 px-4">
+      <header className="flex h-16 items-center gap-1 border-b border-orange-300 bg-gradient-to-r from-orange-200 via-orange-100 to-amber-100 px-2 sm:gap-4 sm:px-4">
         <Link to="/dashboard" className="rounded-full p-2 text-slate-900 transition hover:bg-orange-50 hover:text-orange-600">
           <ArrowLeftIcon className="h-5 w-5" />
         </Link>
-        <div className="min-w-0">
-          <h1 className="truncate text-base font-semibold leading-tight">{survey?.title || 'Untitled survey'}</h1>
-          <p className="text-xs text-slate-400">My surveys</p>
+        <button
+          onClick={() => setQuestionsOpen(true)}
+          className="rounded-full p-2 text-slate-900 transition hover:bg-orange-50 hover:text-orange-600 lg:hidden"
+          title="Questions"
+        >
+          <RowsIcon className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => setEditPanelOpen(true)}
+          className="rounded-full p-2 text-slate-900 transition hover:bg-orange-50 hover:text-orange-600 lg:hidden"
+          title="Edit question"
+        >
+          <Pencil1Icon className="h-5 w-5" />
+        </button>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-sm font-semibold leading-tight sm:text-base">{survey?.title || 'Untitled survey'}</h1>
+          <p className="hidden text-xs text-slate-400 sm:block">My surveys</p>
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex flex-shrink-0 items-center gap-2">
           <button
             onClick={handleSaveNow}
-            className="flex items-center gap-1.5 rounded-full border border-orange-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-orange-700"
+            className="flex items-center gap-1.5 rounded-full border border-orange-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-orange-50 hover:text-orange-700 sm:px-4 sm:py-2 sm:text-sm"
           >
             {saveFeedback ? <CheckIcon className="h-4 w-4 text-emerald-500" /> : null}
             {saveFeedback ? 'Saved' : 'Save'}
@@ -256,47 +274,61 @@ export default function SurveyEditorPage() {
 
       <div className="flex" style={{ height: 'calc(100vh - 4rem)' }}>
         {/* Question list */}
-        <aside className="w-60 shrink-0 overflow-y-auto border-r border-orange-200 bg-orange-100 px-3 py-4">
-          <button
-            onClick={addQuestion}
-            className="mx-auto mb-4 block w-auto rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-105"
-          >
-            + New question
-          </button>
+        {questionsOpen ? (
+          <>
+            <div className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" onClick={() => setQuestionsOpen(false)} />
+            <aside className="fixed inset-y-0 left-0 z-40 w-full max-w-xs overflow-y-auto border-r border-orange-200 bg-orange-100 px-3 py-4 shadow-2xl lg:static lg:z-auto lg:w-60 lg:max-w-none lg:shadow-none">
+              <div className="mb-3 flex items-center justify-between lg:hidden">
+                <span className="text-sm font-semibold text-slate-900">Questions</span>
+                <button onClick={() => setQuestionsOpen(false)} className="rounded-full p-1.5 text-slate-500 hover:bg-orange-200">
+                  <Cross2Icon className="h-4 w-4" />
+                </button>
+              </div>
+              <button
+                onClick={addQuestion}
+                className="mx-auto mb-4 block w-auto rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-105"
+              >
+                + New question
+              </button>
 
-          {loading ? (
-            <p className="text-sm text-slate-400">Loading questions…</p>
-          ) : error && !survey ? (
-            <p className="text-sm text-rose-500">{error}</p>
-          ) : (
-            <div className="space-y-2">
-              {survey?.questions.map((question, index) => {
-                const isSelected = index === selectedIndex;
-                return (
-                  <button
-                    key={question._id || index}
-                    onClick={() => setSelectedIndex(index)}
-                    className={`flex h-16 w-full min-w-0 items-start gap-2 overflow-hidden rounded-xl border border-orange-200 bg-white p-3 text-left shadow-sm transition ${
-                      isSelected ? 'ring-2 ring-orange-500' : 'ring-1 ring-transparent hover:ring-orange-300'
-                    }`}
-                  >
-                    <span className="mt-0.5 shrink-0 text-xs text-slate-400">{index + 1}</span>
-                    <span className="min-w-0 flex-1 truncate text-sm text-slate-700">{question.text}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </aside>
+              {loading ? (
+                <p className="text-sm text-slate-400">Loading questions…</p>
+              ) : error && !survey ? (
+                <p className="text-sm text-rose-500">{error}</p>
+              ) : (
+                <div className="space-y-2">
+                  {survey?.questions.map((question, index) => {
+                    const isSelected = index === selectedIndex;
+                    return (
+                      <button
+                        key={question._id || index}
+                        onClick={() => {
+                          setSelectedIndex(index);
+                          setEditPanelOpen(true);
+                        }}
+                        className={`flex h-16 w-full min-w-0 items-start gap-2 overflow-hidden rounded-xl border border-orange-200 bg-white p-3 text-left shadow-sm transition ${
+                          isSelected ? 'ring-2 ring-orange-500' : 'ring-1 ring-transparent hover:ring-orange-300'
+                        }`}
+                      >
+                        <span className="mt-0.5 shrink-0 text-xs text-slate-400">{index + 1}</span>
+                        <span className="min-w-0 flex-1 truncate text-sm text-slate-700">{question.text}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </aside>
+          </>
+        ) : null}
 
         {/* Form preview */}
-        <main className="flex-1 overflow-auto bg-gradient-to-br from-orange-100 to-amber-50 p-8">
+        <main className="flex-1 overflow-auto bg-gradient-to-br from-orange-100 to-amber-50 p-4 sm:p-8">
           {loading ? (
             <p className="text-slate-400">Loading survey…</p>
           ) : error && !survey ? (
             <p className="text-rose-500">{error}</p>
           ) : survey ? (
-            <div className="mx-auto max-w-2xl rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+            <div className="mx-auto max-w-2xl rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-8">
               <h2 className="text-2xl font-semibold text-slate-900">{survey.title}</h2>
               <p className="mt-1 text-sm text-slate-500">For {survey.audience}</p>
 
@@ -304,7 +336,10 @@ export default function SurveyEditorPage() {
                 {survey.questions.map((question, index) => (
                   <div
                     key={question._id || index}
-                    onClick={() => setSelectedIndex(index)}
+                    onClick={() => {
+                      setSelectedIndex(index);
+                      setEditPanelOpen(true);
+                    }}
                     className={`cursor-pointer rounded-xl p-4 transition ${
                       index === selectedIndex ? 'ring-2 ring-orange-500' : 'ring-1 ring-transparent hover:ring-slate-200'
                     }`}
@@ -360,8 +395,16 @@ export default function SurveyEditorPage() {
         </main>
 
         {/* Edit panel */}
-        <aside className="w-80 shrink-0 overflow-y-auto border-l border-orange-200 bg-orange-100 px-5 py-4">
-          <h2 className="text-base font-semibold">Edit question</h2>
+        {editPanelOpen ? (
+          <>
+            <div className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" onClick={() => setEditPanelOpen(false)} />
+            <aside className="fixed inset-y-0 right-0 z-40 w-full max-w-xs overflow-y-auto border-l border-orange-200 bg-orange-100 px-5 py-4 shadow-2xl lg:static lg:z-auto lg:w-80 lg:max-w-none lg:shadow-none">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold">Edit question</h2>
+            <button onClick={() => setEditPanelOpen(false)} className="rounded-full p-1 text-slate-400 hover:bg-orange-200 lg:hidden">
+              <Cross2Icon className="h-4 w-4" />
+            </button>
+          </div>
 
           {selectedQuestion ? (
             <div className="mt-5 space-y-5">
@@ -480,7 +523,9 @@ export default function SurveyEditorPage() {
           ) : (
             <p className="mt-4 text-sm text-slate-400">No question selected.</p>
           )}
-        </aside>
+            </aside>
+          </>
+        ) : null}
       </div>
     </div>
   );

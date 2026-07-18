@@ -117,7 +117,7 @@ export default function Hero({ isAuthed }: HeroProps) {
             <img
               src="https://images.pexels.com/photos/9034728/pexels-photo-9034728.jpeg?auto=compress&cs=tinysrgb&h=900&w=1200"
               alt="A presenter engaging a live audience"
-              className="h-[420px] w-full object-cover"
+              className="aspect-[4/3] w-full object-cover sm:aspect-[16/10] lg:aspect-auto lg:h-[420px]"
               loading="eager"
             />
           </motion.div>

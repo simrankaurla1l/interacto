@@ -84,7 +84,7 @@ export default function InteractiveWizard({ open, onClose }: InteractiveWizardPr
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-8 shadow-2xl"
+            className="relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl sm:p-8"
           >
             <div
               className="pointer-events-none absolute inset-0 -z-10"

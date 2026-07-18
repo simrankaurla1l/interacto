@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeftIcon, ExternalLinkIcon, Link2Icon } from '@radix-ui/react-icons';
+import { ArrowLeftIcon, Cross2Icon, ExternalLinkIcon, Link2Icon, PersonIcon } from '@radix-ui/react-icons';
 import { api } from '../lib/api.js';
 import { getSocket } from '../lib/socket.js';
 import { useAuth } from '../lib/AuthContext.js';
@@ -39,6 +39,9 @@ export default function QuizHostPage() {
   const [mySelectedOption, setMySelectedOption] = useState<number | null>(null);
   const [hostName, setHostName] = useState<string | null>(() => user?.name || localStorage.getItem('quiz-host-name'));
   const [hostNameDraft, setHostNameDraft] = useState('');
+  const [participantsOpen, setParticipantsOpen] = useState(
+    () => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches
+  );
   const socketRef = useRef(getSocket());
 
   useEffect(() => {
@@ -169,18 +172,26 @@ export default function QuizHostPage() {
           'radial-gradient(circle at 8% 0%, rgba(251,146,60,0.08) 0%, transparent 40%), radial-gradient(circle at 92% 0%, rgba(251,191,36,0.08) 0%, transparent 40%), #f8fafc'
       }}
     >
-      <header className="flex h-16 items-center gap-4 border-b border-orange-300 bg-gradient-to-r from-orange-200 via-orange-100 to-amber-100 px-4">
+      <header className="flex h-16 items-center gap-1 border-b border-orange-300 bg-gradient-to-r from-orange-200 via-orange-100 to-amber-100 px-2 sm:gap-4 sm:px-4">
         <Link to="/dashboard" className="rounded-full p-2 text-slate-900 transition hover:bg-orange-50 hover:text-orange-600">
           <ArrowLeftIcon className="h-5 w-5" />
         </Link>
-        <div className="min-w-0">
-          <h1 className="truncate text-base font-semibold leading-tight">{quiz?.title || 'Untitled quiz'}</h1>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate text-sm font-semibold leading-tight sm:text-base">{quiz?.title || 'Untitled quiz'}</h1>
           <p className="text-xs text-slate-400">Room {roomCode}</p>
         </div>
+        <button
+          onClick={() => setParticipantsOpen(true)}
+          className="flex flex-shrink-0 items-center gap-1.5 rounded-full p-2 text-slate-900 transition hover:bg-orange-50 hover:text-orange-600 lg:hidden"
+          title="Participants"
+        >
+          <PersonIcon className="h-5 w-5" />
+          <span className="text-xs font-medium">{room?.participants.length || 0}</span>
+        </button>
       </header>
 
       <div className="flex" style={{ height: 'calc(100vh - 4rem)' }}>
-        <main className="flex flex-1 items-center justify-center overflow-auto bg-gradient-to-br from-orange-100 to-amber-50 p-8">
+        <main className="flex flex-1 items-center justify-center overflow-auto bg-gradient-to-br from-orange-100 to-amber-50 p-4 sm:p-8">
           {loading ? (
             <p className="text-slate-400">Loading quiz…</p>
           ) : error ? (
@@ -188,7 +199,7 @@ export default function QuizHostPage() {
           ) : !room ? (
             <p className="text-slate-400">Connecting to room…</p>
           ) : !hostName ? (
-            <div className="w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
+            <div className="w-full max-w-sm rounded-3xl bg-white p-5 text-center sm:p-8 shadow-sm ring-1 ring-slate-200">
               <h2 className="text-lg font-semibold text-slate-900">What should we call you?</h2>
               <p className="mt-1 text-sm text-slate-500">You're playing too — this name will show up on the leaderboard.</p>
               <input
@@ -210,9 +221,9 @@ export default function QuizHostPage() {
               </button>
             </div>
           ) : room.status === 'lobby' ? (
-            <div className="w-full max-w-md rounded-3xl bg-white p-10 text-center shadow-sm ring-1 ring-slate-200">
+            <div className="w-full max-w-md rounded-3xl bg-white p-6 text-center sm:p-10 shadow-sm ring-1 ring-slate-200">
               <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Room code</p>
-              <p className="mt-3 text-5xl font-bold tracking-widest text-orange-600">{roomCode}</p>
+              <p className="mt-3 text-4xl font-bold tracking-widest sm:text-5xl text-orange-600">{roomCode}</p>
               <p className="mt-4 text-sm text-slate-500">Share this code, or the link below, so people can join.</p>
               <div className="mt-4 flex items-center justify-center gap-2">
                 <button
@@ -240,12 +251,12 @@ export default function QuizHostPage() {
               </button>
             </div>
           ) : room.status === 'active' && currentQuestion ? (
-            <div className="w-full max-w-2xl rounded-3xl bg-white p-10 text-center shadow-sm ring-1 ring-slate-200">
+            <div className="w-full max-w-2xl rounded-3xl bg-white p-5 text-center sm:p-10 shadow-sm ring-1 ring-slate-200">
               <p className="text-sm font-medium text-slate-400">
                 Question {room.currentQuestionIndex + 1} of {quiz?.questions.length}
               </p>
               <h2 className="mt-4 text-2xl font-semibold text-slate-900">{currentQuestion.text}</h2>
-              <div className="mt-8 grid grid-cols-2 gap-3">
+              <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {currentQuestion.options.map((option, index) => (
                   <button
                     key={index}
@@ -271,7 +282,7 @@ export default function QuizHostPage() {
               </p>
             </div>
           ) : room.status === 'finished' ? (
-            <div className="w-full max-w-md rounded-3xl bg-white p-10 shadow-sm ring-1 ring-slate-200">
+            <div className="w-full max-w-md rounded-3xl bg-white p-5 shadow-sm sm:p-10 ring-1 ring-slate-200">
               <h2 className="text-center text-2xl font-semibold text-slate-900">Final results</h2>
               <div className="mt-6 space-y-2">
                 {sortedParticipants.map((participant, index) => (
@@ -293,8 +304,16 @@ export default function QuizHostPage() {
         </main>
 
         {/* Right sidebar: live participant status */}
-        <aside className="w-80 shrink-0 overflow-y-auto border-l border-orange-200 bg-orange-100 px-5 py-4">
-          <h2 className="text-base font-semibold">Participants</h2>
+        {participantsOpen ? (
+          <>
+            <div className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden" onClick={() => setParticipantsOpen(false)} />
+            <aside className="fixed inset-y-0 right-0 z-40 w-full max-w-xs overflow-y-auto border-l border-orange-200 bg-orange-100 px-5 py-4 shadow-2xl lg:static lg:z-auto lg:w-80 lg:max-w-none lg:shadow-none">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold">Participants</h2>
+            <button onClick={() => setParticipantsOpen(false)} className="rounded-full p-1 text-slate-400 hover:bg-orange-200 lg:hidden">
+              <Cross2Icon className="h-4 w-4" />
+            </button>
+          </div>
           <p className="mt-1 text-xs text-slate-400">{room?.participants.length || 0} / 50</p>
 
           <div className="mt-4 space-y-2">
@@ -320,7 +339,9 @@ export default function QuizHostPage() {
               <p className="text-sm text-slate-400">No one has joined yet.</p>
             )}
           </div>
-        </aside>
+            </aside>
+          </>
+        ) : null}
       </div>
     </div>
   );

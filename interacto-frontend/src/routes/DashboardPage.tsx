@@ -325,7 +325,7 @@ export default function DashboardPage() {
         <div className="pointer-events-none absolute -top-24 right-0 -z-10 h-72 w-72 rounded-full bg-sky-100/50 blur-3xl" />
         <div className="pointer-events-none absolute left-1/3 top-96 -z-10 h-72 w-72 rounded-full bg-fuchsia-100/40 blur-3xl" />
 
-        <main className="flex w-full flex-1 flex-col px-4 py-3">
+        <main className="flex w-full flex-1 flex-col px-4 py-3 pb-24 lg:pb-3">
           <AnimatePresence mode="wait">
             <motion.div
               key={view}
@@ -367,14 +367,14 @@ export default function DashboardPage() {
                       share in seconds.
                     </p>
 
-                    <div className="relative mt-6 inline-flex flex-wrap justify-center gap-1 rounded-full border border-orange-100 bg-white p-1 shadow-sm">
+                    <div className="relative mx-auto mt-6 flex w-full max-w-xs flex-col gap-1 rounded-2xl border border-orange-100 bg-white p-1 shadow-sm sm:inline-flex sm:w-auto sm:max-w-none sm:flex-row sm:rounded-full">
                       {createOptions.map((option) => {
                         const isActive = selectedCreate === option.key;
                         return (
                           <button
                             key={option.key}
                             onClick={() => setSelectedCreate(option.key)}
-                            className="relative flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition sm:text-sm"
+                            className="relative flex w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-xs font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-orange-300 sm:w-auto sm:text-sm"
                           >
                             {isActive ? (
                               <motion.span
@@ -445,11 +445,11 @@ export default function DashboardPage() {
                         { label: 'Surveys', value: surveys.length },
                         { label: 'Quizzes', value: quizzes.length }
                       ].map((stat) => (
-                        <div key={stat.label} className="px-4 text-center">
+                        <div key={stat.label} className="min-w-0 px-1 text-center sm:px-4">
                           <p className="text-lg font-bold text-orange-500">
                             <Counter target={stat.value} />
                           </p>
-                          <p className="text-xs text-slate-500">{stat.label}</p>
+                          <p className="break-words text-xs text-slate-500">{stat.label}</p>
                         </div>
                       ))}
                     </div>
@@ -469,19 +469,19 @@ export default function DashboardPage() {
                 >
                   <thead>
                     <tr className="border-b border-amber-100 bg-gradient-to-r from-orange-500 to-amber-400 text-xs font-semibold uppercase tracking-wide text-white">
-                      <th className="px-5 py-4">Title</th>
-                      <th className="px-5 py-4">Topic</th>
-                      <th className="px-5 py-4">Slides</th>
-                      <th className="px-5 py-4 text-right">Actions</th>
+                      <th className="px-3 py-4 sm:px-5">Title</th>
+                      <th className="px-3 py-4 sm:px-5">Topic</th>
+                      <th className="px-3 py-4 sm:px-5">Slides</th>
+                      <th className="px-3 py-4 sm:px-5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {presentations.map((presentation) => (
                       <tr key={presentation._id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60">
-                        <td className="px-5 py-4 text-xs font-semibold text-slate-900">{presentation.title}</td>
-                        <td className="px-5 py-4 text-xs text-slate-500">{presentation.topic}</td>
-                        <td className="px-5 py-4 text-xs text-slate-500">{presentation.slides.length}</td>
-                        <td className="px-5 py-4">
+                        <td className="px-3 py-4 sm:px-5 text-xs font-semibold text-slate-900">{presentation.title}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{presentation.topic}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{presentation.slides.length}</td>
+                        <td className="px-3 py-4 sm:px-5">
                           <div className="flex items-center justify-end gap-2">
                             <Link
                               to={`/editor/${presentation._id}`}
@@ -524,21 +524,21 @@ export default function DashboardPage() {
                 >
                   <thead>
                     <tr className="border-b border-amber-100 bg-gradient-to-r from-orange-500 to-amber-400 text-xs font-semibold uppercase tracking-wide text-white">
-                      <th className="px-5 py-4">Title</th>
-                      <th className="px-5 py-4">Audience</th>
-                      <th className="px-5 py-4">Questions</th>
-                      <th className="px-5 py-4">Responses</th>
-                      <th className="px-5 py-4 text-right">Actions</th>
+                      <th className="px-3 py-4 sm:px-5">Title</th>
+                      <th className="px-3 py-4 sm:px-5">Audience</th>
+                      <th className="px-3 py-4 sm:px-5">Questions</th>
+                      <th className="px-3 py-4 sm:px-5">Responses</th>
+                      <th className="px-3 py-4 sm:px-5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {surveys.map((survey) => (
                       <tr key={survey._id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60">
-                        <td className="px-5 py-4 text-xs font-semibold text-slate-900">{survey.title}</td>
-                        <td className="px-5 py-4 text-xs text-slate-500">{survey.audience}</td>
-                        <td className="px-5 py-4 text-xs text-slate-500">{survey.questions.length}</td>
-                        <td className="px-5 py-4 text-xs text-slate-500">{survey.responses?.length || 0}</td>
-                        <td className="px-5 py-4">
+                        <td className="px-3 py-4 sm:px-5 text-xs font-semibold text-slate-900">{survey.title}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{survey.audience}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{survey.questions.length}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{survey.responses?.length || 0}</td>
+                        <td className="px-3 py-4 sm:px-5">
                           <div className="flex items-center justify-end gap-2">
                             <Link
                               to={`/survey/${survey._id}`}
@@ -581,23 +581,23 @@ export default function DashboardPage() {
                 >
                   <thead>
                     <tr className="border-b border-amber-100 bg-gradient-to-r from-orange-500 to-amber-400 text-xs font-semibold uppercase tracking-wide text-white">
-                      <th className="px-5 py-4">Title</th>
-                      <th className="px-5 py-4">Audience</th>
-                      <th className="px-5 py-4">Difficulty</th>
-                      <th className="px-5 py-4">Questions</th>
-                      <th className="px-5 py-4">Room</th>
-                      <th className="px-5 py-4 text-right">Actions</th>
+                      <th className="px-3 py-4 sm:px-5">Title</th>
+                      <th className="px-3 py-4 sm:px-5">Audience</th>
+                      <th className="px-3 py-4 sm:px-5">Difficulty</th>
+                      <th className="px-3 py-4 sm:px-5">Questions</th>
+                      <th className="px-3 py-4 sm:px-5">Room</th>
+                      <th className="px-3 py-4 sm:px-5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {quizzes.map((quiz) => (
                       <tr key={quiz._id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60">
-                        <td className="px-5 py-4 text-xs font-semibold text-slate-900">{quiz.title}</td>
-                        <td className="px-5 py-4 text-xs text-slate-500">{quiz.audience}</td>
-                        <td className="px-5 py-4 text-xs capitalize text-slate-500">{quiz.difficulty}</td>
-                        <td className="px-5 py-4 text-xs text-slate-500">{quiz.questions.length}</td>
-                        <td className="px-5 py-4 text-xs text-slate-500">{quiz.roomCode}</td>
-                        <td className="px-5 py-4">
+                        <td className="px-3 py-4 sm:px-5 text-xs font-semibold text-slate-900">{quiz.title}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{quiz.audience}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs capitalize text-slate-500">{quiz.difficulty}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{quiz.questions.length}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{quiz.roomCode}</td>
+                        <td className="px-3 py-4 sm:px-5">
                           <div className="flex items-center justify-end gap-2">
                             <Link
                               to={`/quiz/${quiz._id}/host/${quiz.roomCode}`}

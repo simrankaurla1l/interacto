@@ -11,7 +11,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalPageLayout title="Privacy Policy" updated="July 2026">
+    <LegalPageLayout title="Privacy Policy" updated="July 2026" theme="orange">
       <Section title="What we collect">
         <p>
           If you create an account (to build a presentation, survey, or host a quiz), we collect your name,
