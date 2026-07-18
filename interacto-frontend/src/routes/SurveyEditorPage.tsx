@@ -40,6 +40,7 @@ export default function SurveyEditorPage() {
   const [saveFeedback, setSaveFeedback] = useState(false);
   const [questionsOpen, setQuestionsOpen] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches);
   const [editPanelOpen, setEditPanelOpen] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches);
+  const [view, setView] = useState<'create' | 'results'>('create');
   const autosaveTimerRef = useRef<number | null>(null);
 
   const selectedQuestion = survey?.questions[selectedIndex];
@@ -272,7 +273,35 @@ export default function SurveyEditorPage() {
         </div>
       </header>
 
-      <div className="flex" style={{ height: 'calc(100vh - 4rem)' }}>
+      <div className="flex items-center gap-1 border-b border-orange-200 bg-white px-2 sm:px-4">
+        <button
+          onClick={() => setView('create')}
+          className={`relative flex items-center px-3 py-2.5 text-sm font-semibold transition ${
+            view === 'create' ? 'text-orange-600' : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Create
+          {view === 'create' ? <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-orange-500" /> : null}
+        </button>
+        <button
+          onClick={() => setView('results')}
+          className={`relative flex items-center gap-1.5 px-3 py-2.5 text-sm font-semibold transition ${
+            view === 'results' ? 'text-orange-600' : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          Results
+          <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-xs">{survey?.responses?.length || 0}</span>
+          {view === 'results' ? <span className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-orange-500" /> : null}
+        </button>
+      </div>
+
+      <div className="flex" style={{ height: 'calc(100vh - 7rem)' }}>
+        {view === 'results' ? (
+          <main className="flex-1 overflow-auto bg-gradient-to-br from-orange-100 to-amber-50 p-4 sm:p-8">
+            <SurveyResultsView survey={survey} />
+          </main>
+        ) : (
+        <>
         {/* Question list */}
         {questionsOpen ? (
           <>
@@ -526,7 +555,134 @@ export default function SurveyEditorPage() {
             </aside>
           </>
         ) : null}
+        </>
+        )}
       </div>
+    </div>
+  );
+}
+
+function SurveyResultsView({ survey }: { survey: Survey | null }) {
+  if (!survey) return null;
+  const responses = survey.responses || [];
+
+  if (responses.length === 0) {
+    return (
+      <div className="mx-auto max-w-2xl rounded-3xl border border-dashed border-orange-200 bg-white/80 p-12 text-center">
+        <p className="text-sm font-semibold text-slate-700">No responses yet</p>
+        <p className="mt-1 text-xs text-slate-500">Share your survey link and responses will show up here.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-4">
+      <div className="rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
+        <p className="text-sm text-slate-500">Total responses</p>
+        <p className="mt-1 text-3xl font-bold text-orange-600">{responses.length}</p>
+      </div>
+
+      {survey.questions.map((question, index) => {
+        const answers = responses
+          .map((response) => response.answers[index])
+          .filter((answer): answer is string => Boolean(answer && answer.trim()));
+
+        return (
+          <div key={question._id || index} className="rounded-2xl border border-orange-100 bg-white p-5 shadow-sm">
+            <p className="text-sm font-semibold text-slate-900">
+              {index + 1}. {question.text}
+            </p>
+            <p className="mt-1 text-xs text-slate-400">
+              {answers.length} response{answers.length === 1 ? '' : 's'}
+            </p>
+
+            <div className="mt-4">
+              {question.type === 'multiple_choice' ? (
+                <MultipleChoiceBreakdown options={question.options} answers={answers} />
+              ) : question.type === 'rating' ? (
+                <RatingBreakdown answers={answers} />
+              ) : (
+                <TextAnswerList answers={answers} />
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function MultipleChoiceBreakdown({ options, answers }: { options: string[]; answers: string[] }) {
+  const total = answers.length;
+  const counts = options.map((option) => answers.filter((answer) => answer === option).length);
+  const maxCount = Math.max(1, ...counts);
+
+  return (
+    <div className="space-y-2.5">
+      {options.map((option, index) => {
+        const count = counts[index];
+        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+        return (
+          <div key={option}>
+            <div className="flex items-center justify-between text-xs text-slate-600">
+              <span className="font-medium text-slate-700">{option}</span>
+              <span>
+                {count} ({pct}%)
+              </span>
+            </div>
+            <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400"
+                style={{ width: `${(count / maxCount) * 100}%` }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function RatingBreakdown({ answers }: { answers: string[] }) {
+  const values = answers.map((answer) => Number(answer)).filter((value) => !Number.isNaN(value));
+  const average = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+  const counts = [1, 2, 3, 4, 5].map((n) => values.filter((value) => value === n).length);
+  const maxCount = Math.max(1, ...counts);
+
+  return (
+    <div>
+      <p className="text-2xl font-bold text-orange-600">
+        {average.toFixed(1)} <span className="text-sm font-medium text-slate-400">/ 5 average</span>
+      </p>
+      <div className="mt-3 space-y-2">
+        {[1, 2, 3, 4, 5].map((n, index) => (
+          <div key={n} className="flex items-center gap-2">
+            <span className="w-3 text-xs font-medium text-slate-500">{n}</span>
+            <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400"
+                style={{ width: `${(counts[index] / maxCount) * 100}%` }}
+              />
+            </div>
+            <span className="w-6 text-right text-xs text-slate-500">{counts[index]}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TextAnswerList({ answers }: { answers: string[] }) {
+  if (answers.length === 0) {
+    return <p className="text-xs text-slate-400">No answers yet.</p>;
+  }
+  return (
+    <div className="max-h-64 space-y-2 overflow-y-auto">
+      {answers.map((answer, index) => (
+        <p key={index} className="rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-700">
+          {answer}
+        </p>
+      ))}
     </div>
   );
 }
