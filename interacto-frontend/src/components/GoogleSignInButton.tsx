@@ -25,11 +25,13 @@ export default function GoogleSignInButton({ onSuccess, onError, theme = 'filled
     return () => observer.disconnect();
   }, []);
 
+  const buttonWidth = Math.min(400, Math.max(200, Math.round(width)));
+
   return (
-    <div ref={containerRef} className="w-full">
+    <div ref={containerRef} className="flex w-full justify-center">
       {width > 0 ? (
         <GoogleLogin
-          key={Math.round(width)}
+          key={buttonWidth}
           onSuccess={async (credentialResponse) => {
             if (!credentialResponse.credential) {
               onError('Google did not return a credential. Please try again.');
@@ -45,7 +47,7 @@ export default function GoogleSignInButton({ onSuccess, onError, theme = 'filled
           onError={() => onError('Google sign-in was cancelled or failed.')}
           theme={theme}
           shape="pill"
-          width={Math.round(width)}
+          width={buttonWidth}
         />
       ) : null}
     </div>
