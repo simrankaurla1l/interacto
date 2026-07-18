@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { EnvelopeClosedIcon, LockClosedIcon, EyeOpenIcon, EyeClosedIcon, PersonIcon, QuoteIcon } from '@radix-ui/react-icons';
+import { ArrowLeftIcon, EnvelopeClosedIcon, LockClosedIcon, EyeOpenIcon, EyeClosedIcon, PersonIcon, QuoteIcon } from '@radix-ui/react-icons';
 import { useAuth } from '../lib/AuthContext.js';
 import GoogleSignInButton from '../components/GoogleSignInButton.js';
 
@@ -57,12 +57,21 @@ export default function SignUpPage() {
         className="relative grid w-full max-w-[min(64rem,calc(100vw-3rem))] max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[2.5rem] shadow-2xl lg:grid-cols-2"
       >
         <div className="flex flex-col justify-center bg-gradient-to-b from-orange-50 to-amber-50 px-8 py-8 sm:px-12">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 text-sm font-bold text-white">
-              I
-            </span>
-            <span className="text-lg font-semibold text-slate-900">Interacto</span>
-          </Link>
+          <div className="flex items-center justify-between gap-2">
+            <Link to="/" className="flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 text-sm font-bold text-white">
+                I
+              </span>
+              <span className="text-lg font-semibold text-slate-900">Interacto</span>
+            </Link>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-700 transition hover:border-orange-300 hover:bg-orange-50"
+            >
+              <ArrowLeftIcon className="h-3.5 w-3.5" />
+              Home
+            </Link>
+          </div>
 
           <div className="mt-6 text-center">
             <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
