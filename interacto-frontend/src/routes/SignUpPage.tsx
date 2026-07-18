@@ -54,7 +54,7 @@ export default function SignUpPage() {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="relative grid w-full max-w-[min(64rem,calc(100vw-3rem))] max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[2.5rem] shadow-2xl lg:grid-cols-2"
+        className="relative grid w-full max-w-[64rem] max-h-[calc(100vh-3rem)] overflow-y-auto rounded-[2.5rem] shadow-2xl lg:grid-cols-2"
       >
         <div className="flex flex-col justify-center bg-gradient-to-b from-orange-50 to-amber-50 px-8 py-8 sm:px-12">
           <div className="mx-auto w-full max-w-sm">
