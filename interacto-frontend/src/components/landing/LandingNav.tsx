@@ -30,14 +30,12 @@ export default function LandingNav({ isAuthed }: LandingNavProps) {
   }, []);
 
   return (
-    <motion.header
-      initial={{ opacity: 0, y: -16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+    <header
       className={`sticky top-0 z-50 border-b transition-all duration-300 ${
         scrolled ? 'border-slate-200 bg-white/85 shadow-sm backdrop-blur-lg' : 'border-transparent bg-white/60 backdrop-blur-sm'
       }`}
     >
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
           <motion.span
@@ -113,6 +111,7 @@ export default function LandingNav({ isAuthed }: LandingNavProps) {
           </motion.div>
         ) : null}
       </AnimatePresence>
-    </motion.header>
+      </motion.div>
+    </header>
   );
 }

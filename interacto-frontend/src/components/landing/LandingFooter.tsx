@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
-import { LinkedInLogoIcon } from '@radix-ui/react-icons';
+import { EnvelopeClosedIcon, LinkedInLogoIcon, SewingPinFilledIcon } from '@radix-ui/react-icons';
 import Reveal from './Reveal.js';
 
 const LINKEDIN_URL = 'https://www.linkedin.com/in/simran-k21';
 const CONTACT_NUMBER = '739-489-7487';
+const CONTACT_EMAIL = 'smrnkaur222@gmail.com';
+const LOCATION = 'Bangalore, 560068';
 
 const quickLinks = [
   { href: '#features', label: 'Features' },
@@ -62,7 +64,27 @@ export default function LandingFooter() {
 
           <div>
             <p className="text-sm font-semibold text-slate-900">Connect</p>
-            <ul className="mt-4 space-y-2.5 text-sm text-slate-500">
+            <p className="mt-4 text-sm font-semibold text-slate-800">Simran Kaur</p>
+            <p className="text-xs text-slate-500">Full-Stack Developer</p>
+            <ul className="mt-3 space-y-2.5 text-sm text-slate-500">
+              <li className="flex items-center gap-2">
+                <SewingPinFilledIcon className="h-4 w-4 flex-shrink-0 text-orange-400" />
+                {LOCATION}
+              </li>
+              <li>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="inline-flex items-center gap-2 transition hover:text-slate-900"
+                >
+                  <EnvelopeClosedIcon className="h-4 w-4" />
+                  {CONTACT_EMAIL}
+                </a>
+              </li>
+              <li>
+                <a href={`tel:${CONTACT_NUMBER.replace(/[^+\d]/g, '')}`} className="transition hover:text-slate-900">
+                  {CONTACT_NUMBER}
+                </a>
+              </li>
               <li>
                 <a
                   href={LINKEDIN_URL}
@@ -72,11 +94,6 @@ export default function LandingFooter() {
                 >
                   <LinkedInLogoIcon className="h-4 w-4" />
                   LinkedIn
-                </a>
-              </li>
-              <li>
-                <a href={`tel:${CONTACT_NUMBER.replace(/[^+\d]/g, '')}`} className="transition hover:text-slate-900">
-                  {CONTACT_NUMBER}
                 </a>
               </li>
             </ul>

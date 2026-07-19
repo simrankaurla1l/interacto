@@ -229,18 +229,18 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="flex h-screen overflow-x-hidden bg-white">
-      <aside className="sticky top-0 z-40 flex h-screen w-20 flex-shrink-0 flex-col overflow-visible border-r border-orange-100 bg-gradient-to-b from-orange-50/50 via-white to-white">
-        <Link to="/" className="flex items-center justify-center px-0 py-6">
+    <div className="flex h-screen flex-col overflow-x-hidden bg-white sm:flex-row">
+      <aside className="sticky top-0 z-40 flex w-full flex-shrink-0 flex-row items-center justify-center gap-0.5 overflow-hidden border-b border-orange-100 bg-gradient-to-r from-orange-50/50 via-white to-white px-1 py-1 sm:h-screen sm:w-20 sm:flex-col sm:items-stretch sm:justify-start sm:gap-0 sm:overflow-visible sm:border-b-0 sm:border-r sm:bg-gradient-to-b sm:px-0 sm:py-0">
+        <Link to="/" className="flex flex-shrink-0 items-center justify-center px-0.5 py-1 sm:px-0 sm:py-6">
           <motion.span
             whileHover={{ rotate: -8, scale: 1.1 }}
-            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 text-sm font-bold text-white"
+            className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white sm:h-8 sm:w-8 sm:rounded-xl sm:text-sm bg-gradient-to-br from-orange-500 to-amber-400"
           >
             I
           </motion.span>
         </Link>
 
-        <nav className="flex-1 space-y-1 px-2">
+        <nav className="flex flex-1 items-center justify-center gap-0.5 sm:flex-col sm:items-stretch sm:justify-start sm:gap-0 sm:space-y-1 sm:px-2">
           {navItems.map((navItem) => {
             const isActive = view === navItem.key;
             return (
@@ -248,22 +248,22 @@ export default function DashboardPage() {
                 <motion.button
                   onClick={() => setView(navItem.key)}
                   whileTap={{ scale: 0.95 }}
-                  className="relative flex w-full items-center justify-center rounded-xl px-0 py-2.5 text-sm font-medium text-slate-600 transition hover:text-orange-700"
+                  className="relative flex flex-shrink-0 items-center justify-center rounded-lg p-1 text-sm font-medium text-slate-600 transition hover:text-orange-700 sm:rounded-xl sm:w-full sm:px-0 sm:py-2.5"
                 >
                   {isActive ? (
                     <motion.span
                       layoutId="sidebar-active"
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                      className={`absolute inset-0 rounded-xl ${navItem.activeBg}`}
+                      className={`absolute inset-0 rounded-lg sm:rounded-xl ${navItem.activeBg}`}
                     />
                   ) : null}
                   <span className="relative z-10 flex items-center">
-                    <span className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg ${navItem.tint}`}>
-                      <navItem.icon className="h-3.5 w-3.5" />
+                    <span className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md sm:h-6 sm:w-6 sm:rounded-lg ${navItem.tint}`}>
+                      <navItem.icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     </span>
                   </span>
                   {typeof navItem.count === 'number' ? (
-                    <span className="absolute right-1 top-1 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[10px] font-semibold text-slate-500 shadow-sm">
+                    <span className="absolute right-0 top-0 z-10 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-white px-0.5 text-[9px] font-semibold text-slate-500 shadow-sm sm:right-1 sm:top-1 sm:h-4 sm:min-w-4 sm:text-[10px]">
                       {navItem.count}
                     </span>
                   ) : null}
@@ -272,23 +272,23 @@ export default function DashboardPage() {
             );
           })}
 
-          <div className="my-3 h-px bg-orange-100" />
+          <div className="mx-0.5 h-5 w-px flex-shrink-0 bg-orange-100 sm:mx-0 sm:my-3 sm:h-px sm:w-full" />
 
           <SidebarTooltip label="Support">
             <motion.a
               href="/support"
               whileTap={{ scale: 0.95 }}
-              className="flex w-full items-center justify-center rounded-xl px-0 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-orange-50 hover:text-orange-700"
+              className="flex flex-shrink-0 items-center justify-center rounded-lg p-1 text-sm font-medium text-slate-600 transition hover:bg-orange-50 hover:text-orange-700 sm:rounded-xl sm:w-full sm:px-0 sm:py-2.5"
             >
-              <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-500">
-                <QuestionMarkCircledIcon className="h-3.5 w-3.5" />
+              <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-orange-50 text-orange-500 sm:h-6 sm:w-6 sm:rounded-lg">
+                <QuestionMarkCircledIcon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </span>
             </motion.a>
           </SidebarTooltip>
         </nav>
 
         {user ? (
-          <div ref={profileRef} className="relative border-t border-orange-100 p-3">
+          <div ref={profileRef} className="relative ml-auto flex-shrink-0 border-l border-orange-100 pl-1 sm:ml-0 sm:border-l-0 sm:border-t sm:p-3">
             <AnimatePresence>
               {profileMenuOpen ? (
                 <motion.div
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 8, scale: 0.98 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute bottom-full left-3 mb-2 w-64 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-lg"
+                  className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-lg sm:bottom-full sm:left-3 sm:right-auto sm:top-auto sm:mb-2 sm:mt-0"
                 >
                   <div className="border-b border-orange-100 px-4 py-2.5">
                     <p className="truncate text-xs font-semibold text-slate-900">{user.name}</p>
@@ -326,9 +326,9 @@ export default function DashboardPage() {
             <SidebarTooltip label={user.name}>
               <button
                 onClick={() => setProfileMenuOpen((value) => !value)}
-                className="flex w-full items-center justify-center rounded-xl px-0 py-2 text-left transition hover:bg-orange-50"
+                className="flex items-center justify-center rounded-xl p-1 text-left transition hover:bg-orange-50 sm:w-full sm:px-0 sm:py-2"
               >
-                <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-400 text-sm font-semibold text-white">
+                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-400 text-xs font-semibold text-white sm:h-9 sm:w-9 sm:text-sm">
                   {user.name.charAt(0).toUpperCase()}
                 </span>
               </button>
@@ -337,7 +337,7 @@ export default function DashboardPage() {
         ) : null}
       </aside>
 
-      <div className="relative flex h-screen min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden sm:h-screen">
         <div className="pointer-events-none absolute -top-24 right-0 -z-10 h-72 w-72 rounded-full bg-sky-100/50 blur-3xl" />
         <div className="pointer-events-none absolute left-1/3 top-96 -z-10 h-72 w-72 rounded-full bg-fuchsia-100/40 blur-3xl" />
 
@@ -842,9 +842,9 @@ function QuizSample() {
 
 function SidebarTooltip({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="group relative">
+    <div className="group relative flex-shrink-0">
       {children}
-      <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
+      <span className="pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 sm:left-full sm:top-1/2 sm:mt-0 sm:ml-3 sm:translate-x-0 sm:-translate-y-1/2">
         {label}
       </span>
     </div>

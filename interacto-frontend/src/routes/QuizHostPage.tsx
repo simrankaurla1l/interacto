@@ -191,7 +191,10 @@ export default function QuizHostPage() {
       </header>
 
       <div className="flex" style={{ height: 'calc(100vh - 4rem)' }}>
-        <main className="flex flex-1 items-center justify-center overflow-auto bg-gradient-to-br from-orange-100 to-amber-50 p-4 sm:p-8">
+        <main
+          className="flex flex-1 overflow-auto bg-gradient-to-br from-orange-100 to-amber-50 p-4 sm:p-8"
+          style={{ containerType: 'size' }}
+        >
           {loading ? (
             <p className="text-slate-400">Loading quiz…</p>
           ) : error ? (
@@ -199,7 +202,7 @@ export default function QuizHostPage() {
           ) : !room ? (
             <p className="text-slate-400">Connecting to room…</p>
           ) : !hostName ? (
-            <div className="w-full max-w-sm rounded-3xl bg-white p-5 text-center sm:p-8 shadow-sm ring-1 ring-slate-200">
+            <div className="m-auto w-full max-w-sm max-h-full overflow-y-auto rounded-3xl bg-white p-5 text-center sm:p-8 shadow-sm ring-1 ring-slate-200">
               <h2 className="text-lg font-semibold text-slate-900">What should we call you?</h2>
               <p className="mt-1 text-sm text-slate-500">You're playing too — this name will show up on the leaderboard.</p>
               <input
@@ -221,7 +224,7 @@ export default function QuizHostPage() {
               </button>
             </div>
           ) : room.status === 'lobby' ? (
-            <div className="w-full max-w-md rounded-3xl bg-white p-6 text-center sm:p-10 shadow-sm ring-1 ring-slate-200">
+            <div className="m-auto w-full max-w-md max-h-full overflow-y-auto rounded-3xl bg-white p-6 text-center sm:p-10 shadow-sm ring-1 ring-slate-200">
               <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Room code</p>
               <p className="mt-3 text-4xl font-bold tracking-widest sm:text-5xl text-orange-600">{roomCode}</p>
               <p className="mt-4 text-sm text-slate-500">Share this code, or the link below, so people can join.</p>
@@ -251,18 +254,30 @@ export default function QuizHostPage() {
               </button>
             </div>
           ) : room.status === 'active' && currentQuestion ? (
-            <div className="w-full max-w-2xl rounded-3xl bg-white p-5 text-center sm:p-10 shadow-sm ring-1 ring-slate-200">
+            <div
+              className="m-auto w-full max-w-2xl max-h-full overflow-y-auto rounded-3xl bg-white text-center shadow-sm ring-1 ring-slate-200"
+              style={{ padding: 'clamp(0.75rem, 4cqh, 2.5rem)' }}
+            >
               <p className="text-sm font-medium text-slate-400">
                 Question {room.currentQuestionIndex + 1} of {quiz?.questions.length}
               </p>
-              <h2 className="mt-4 text-2xl font-semibold text-slate-900">{currentQuestion.text}</h2>
-              <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <h2
+                className="font-semibold text-slate-900"
+                style={{ marginTop: 'clamp(0.375rem, 2cqh, 1rem)', fontSize: 'clamp(1rem, 5cqh, 1.5rem)' }}
+              >
+                {currentQuestion.text}
+              </h2>
+              <div
+                className="grid grid-cols-1 sm:grid-cols-2"
+                style={{ marginTop: 'clamp(0.5rem, 3cqh, 2rem)', gap: 'clamp(0.375rem, 1.5cqh, 0.75rem)' }}
+              >
                 {currentQuestion.options.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => submitMyAnswer(index)}
                     disabled={mySelectedOption !== null}
-                    className={`rounded-xl border px-4 py-3 text-left text-sm transition ${
+                    style={{ padding: 'clamp(0.5rem, 2cqh, 0.75rem) 1rem' }}
+                    className={`rounded-xl border text-left text-sm transition ${
                       mySelectedOption === index
                         ? 'border-orange-500 bg-orange-50 text-orange-700'
                         : 'border-slate-200 text-slate-600 hover:border-orange-300 disabled:hover:border-slate-200'
@@ -275,14 +290,19 @@ export default function QuizHostPage() {
               {mySelectedOption !== null ? (
                 <p className="mt-4 text-sm text-slate-400">Answer submitted — waiting for the next question…</p>
               ) : null}
-              <p className="mt-6 text-4xl font-bold text-orange-600">{secondsLeft}s</p>
+              <p
+                className="font-bold text-orange-600"
+                style={{ marginTop: 'clamp(0.375rem, 2cqh, 1.5rem)', fontSize: 'clamp(1.25rem, 5cqh, 2.25rem)' }}
+              >
+                {secondsLeft}s
+              </p>
               <p className="mt-2 text-sm text-slate-400">
                 {room.participants.filter((p) => p.answeredCurrent).length} / {room.participants.filter((p) => p.connected).length}{' '}
                 answered
               </p>
             </div>
           ) : room.status === 'finished' ? (
-            <div className="w-full max-w-md rounded-3xl bg-white p-5 shadow-sm sm:p-10 ring-1 ring-slate-200">
+            <div className="m-auto w-full max-w-md max-h-full overflow-y-auto rounded-3xl bg-white p-5 shadow-sm sm:p-10 ring-1 ring-slate-200">
               <h2 className="text-center text-2xl font-semibold text-slate-900">Final results</h2>
               <div className="mt-6 space-y-2">
                 {sortedParticipants.map((participant, index) => (
