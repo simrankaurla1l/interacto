@@ -1,6 +1,7 @@
 import express from 'express';
 import Survey from '../models/Survey.js';
 import { generateText, parseJSON, looksLikeRawJson } from '../lib/gemini.js';
+import { requireAuth } from '../lib/auth.js';
 
 const router = express.Router();
 
@@ -40,8 +41,8 @@ function parseSurveyQuestions(text) {
     .slice(0, 20);
 }
 
-router.get('/', async (req, res) => {
-  const surveys = await Survey.find().sort({ createdAt: -1 }).limit(20);
+router.get('/', requireAuth, async (req, res) => {
+  const surveys = await Survey.find({ user: req.userId }).sort({ createdAt: -1 }).limit(20);
   res.send({ surveys });
 });
 
@@ -53,7 +54,7 @@ router.get('/:id', async (req, res) => {
   res.send({ survey });
 });
 
-router.post('/generate', async (req, res) => {
+router.post('/generate', requireAuth, async (req, res) => {
   const { title, audience, goal, questionCount } = req.body;
   if (!title || !audience || !goal) {
     return res.status(400).send({ error: 'Title, audience, and goal are required' });
@@ -98,7 +99,7 @@ Do not add markdown or commentary. Example:
       questions = questions.slice(0, count);
     }
 
-    const survey = await Survey.create({ title, audience, goal, questions });
+    const survey = await Survey.create({ user: req.userId, title, audience, goal, questions });
     return res.send({ surveyId: survey._id, survey });
   } catch (error) {
     console.error('Survey generation failed:', error);
@@ -106,9 +107,9 @@ Do not add markdown or commentary. Example:
   }
 });
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', requireAuth, async (req, res) => {
   const { title, audience, goal } = req.body;
-  const survey = await Survey.findById(req.params.id);
+  const survey = await Survey.findOne({ _id: req.params.id, user: req.userId });
   if (!survey) {
     return res.status(404).send({ error: 'Survey not found' });
   }
@@ -131,16 +132,16 @@ router.patch('/:id', async (req, res) => {
   res.send({ survey });
 });
 
-router.delete('/:id', async (req, res) => {
-  const survey = await Survey.findByIdAndDelete(req.params.id);
+router.delete('/:id', requireAuth, async (req, res) => {
+  const survey = await Survey.findOneAndDelete({ _id: req.params.id, user: req.userId });
   if (!survey) {
     return res.status(404).send({ error: 'Survey not found' });
   }
   res.send({ success: true });
 });
 
-router.post('/:id/questions', async (req, res) => {
-  const survey = await Survey.findById(req.params.id);
+router.post('/:id/questions', requireAuth, async (req, res) => {
+  const survey = await Survey.findOne({ _id: req.params.id, user: req.userId });
   if (!survey) {
     return res.status(404).send({ error: 'Survey not found' });
   }
@@ -149,9 +150,9 @@ router.post('/:id/questions', async (req, res) => {
   res.send({ survey });
 });
 
-router.patch('/:id/questions/:index', async (req, res) => {
+router.patch('/:id/questions/:index', requireAuth, async (req, res) => {
   const { text, type, options, required, move } = req.body;
-  const survey = await Survey.findById(req.params.id);
+  const survey = await Survey.findOne({ _id: req.params.id, user: req.userId });
   if (!survey) {
     return res.status(404).send({ error: 'Survey not found' });
   }
@@ -198,8 +199,8 @@ router.patch('/:id/questions/:index', async (req, res) => {
   res.send({ survey });
 });
 
-router.delete('/:id/questions/:index', async (req, res) => {
-  const survey = await Survey.findById(req.params.id);
+router.delete('/:id/questions/:index', requireAuth, async (req, res) => {
+  const survey = await Survey.findOne({ _id: req.params.id, user: req.userId });
   if (!survey) {
     return res.status(404).send({ error: 'Survey not found' });
   }

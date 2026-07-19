@@ -3,6 +3,7 @@ import Quiz from '../models/Quiz.js';
 import QuizRoom from '../models/QuizRoom.js';
 import { generateText, parseJSON, looksLikeRawJson } from '../lib/gemini.js';
 import { generateUniqueRoomCode, serializeRoom } from '../lib/quizRoom.js';
+import { requireAuth } from '../lib/auth.js';
 
 const router = express.Router();
 
@@ -89,13 +90,13 @@ function createGenericQuestions(topic, count, startIndex = 0) {
   }));
 }
 
-router.get('/', async (req, res) => {
-  const quizzes = await Quiz.find().sort({ createdAt: -1 }).limit(20);
+router.get('/', requireAuth, async (req, res) => {
+  const quizzes = await Quiz.find({ user: req.userId }).sort({ createdAt: -1 }).limit(20);
   res.send({ quizzes });
 });
 
-router.get('/:id', async (req, res) => {
-  const quiz = await Quiz.findById(req.params.id);
+router.get('/:id', requireAuth, async (req, res) => {
+  const quiz = await Quiz.findOne({ _id: req.params.id, user: req.userId });
   if (!quiz) {
     return res.status(404).send({ error: 'Quiz not found' });
   }
@@ -114,8 +115,8 @@ router.get('/rooms/:code', async (req, res) => {
   });
 });
 
-router.delete('/:id', async (req, res) => {
-  const quiz = await Quiz.findByIdAndDelete(req.params.id);
+router.delete('/:id', requireAuth, async (req, res) => {
+  const quiz = await Quiz.findOneAndDelete({ _id: req.params.id, user: req.userId });
   if (!quiz) {
     return res.status(404).send({ error: 'Quiz not found' });
   }
@@ -123,7 +124,7 @@ router.delete('/:id', async (req, res) => {
   res.send({ success: true });
 });
 
-router.post('/generate', async (req, res) => {
+router.post('/generate', requireAuth, async (req, res) => {
   const { title, audience, goal, questionCount, difficulty } = req.body;
   if (!title || !audience || !goal) {
     return res.status(400).send({ error: 'Title, audience, and goal are required' });
@@ -158,6 +159,7 @@ Example:
     }
 
     const quiz = await Quiz.create({
+      user: req.userId,
       title,
       audience,
       goal,

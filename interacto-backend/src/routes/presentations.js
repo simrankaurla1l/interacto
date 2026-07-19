@@ -2,6 +2,7 @@ import express from 'express';
 import sanitizeHtml from 'sanitize-html';
 import Presentation from '../models/Presentation.js';
 import { apiKey, generateText, parseJSON, looksLikeRawJson } from '../lib/gemini.js';
+import { requireAuth } from '../lib/auth.js';
 
 const router = express.Router();
 
@@ -249,8 +250,8 @@ async function generateSlideImages(slides, topic, audience, goal) {
   return slidesWithImages;
 }
 
-router.get('/', async (req, res) => {
-  const presentations = await Presentation.find().sort({ createdAt: -1 }).limit(20);
+router.get('/', requireAuth, async (req, res) => {
+  const presentations = await Presentation.find({ user: req.userId }).sort({ createdAt: -1 }).limit(20);
   res.send({ presentations });
 });
 
@@ -262,9 +263,9 @@ router.get('/:id', async (req, res) => {
   res.send({ presentation });
 });
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', requireAuth, async (req, res) => {
   const { title } = req.body;
-  const presentation = await Presentation.findById(req.params.id);
+  const presentation = await Presentation.findOne({ _id: req.params.id, user: req.userId });
   if (!presentation) {
     return res.status(404).send({ error: 'Presentation not found' });
   }
@@ -281,21 +282,21 @@ router.patch('/:id', async (req, res) => {
   res.send({ presentation });
 });
 
-router.delete('/:id', async (req, res) => {
-  const presentation = await Presentation.findByIdAndDelete(req.params.id);
+router.delete('/:id', requireAuth, async (req, res) => {
+  const presentation = await Presentation.findOneAndDelete({ _id: req.params.id, user: req.userId });
   if (!presentation) {
     return res.status(404).send({ error: 'Presentation not found' });
   }
   res.send({ success: true });
 });
 
-router.post('/:id/slides', async (req, res) => {
+router.post('/:id/slides', requireAuth, async (req, res) => {
   const { slide } = req.body;
   if (!slide || !slide.title || !slide.content) {
     return res.status(400).send({ error: 'Slide title and content are required' });
   }
 
-  const presentation = await Presentation.findById(req.params.id);
+  const presentation = await Presentation.findOne({ _id: req.params.id, user: req.userId });
   if (!presentation) {
     return res.status(404).send({ error: 'Presentation not found' });
   }
@@ -346,7 +347,7 @@ function parseChart(value) {
   return { type: value.type, data };
 }
 
-router.patch('/:id/slides/:index', async (req, res) => {
+router.patch('/:id/slides/:index', requireAuth, async (req, res) => {
   const {
     title,
     content,
@@ -363,7 +364,7 @@ router.patch('/:id/slides/:index', async (req, res) => {
     bgColor,
     move
   } = req.body;
-  const presentation = await Presentation.findById(req.params.id);
+  const presentation = await Presentation.findOne({ _id: req.params.id, user: req.userId });
   if (!presentation) {
     return res.status(404).send({ error: 'Presentation not found' });
   }
@@ -442,7 +443,7 @@ router.patch('/:id/slides/:index', async (req, res) => {
   res.send({ presentation });
 });
 
-router.post('/questions', async (req, res) => {
+router.post('/questions', requireAuth, async (req, res) => {
   const { topic, audience, goal } = req.body;
   if (!topic || !audience || !goal) {
     return res.status(400).send({ error: 'Topic, audience, and goal are required' });
@@ -486,7 +487,7 @@ Example:
   }
 });
 
-router.post('/generate', async (req, res) => {
+router.post('/generate', requireAuth, async (req, res) => {
   const { topic, audience, goal, questions, answers } = req.body;
   if (!topic || !audience || !goal || !questions || !answers) {
     return res.status(400).send({ error: 'Topic, audience, goal, questions, and answers are required' });
@@ -520,6 +521,7 @@ Example:
 
   try {
     const presentation = await Presentation.create({
+      user: req.userId,
       title,
       topic,
       audience,
