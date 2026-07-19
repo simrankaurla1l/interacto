@@ -117,12 +117,12 @@ export default function QuizJoinPage() {
               if (event.key === 'Enter' && name.trim()) joinRoom(name.trim());
             }}
             placeholder="Your name"
-            className="mt-6 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-indigo-400"
+            className="mt-6 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-orange-400"
           />
           <button
             onClick={() => name.trim() && joinRoom(name.trim())}
             disabled={joining || !name.trim()}
-            className="mt-4 w-full rounded-full bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-4 w-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-3 text-sm font-semibold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {joining ? 'Joining…' : 'Join'}
           </button>
@@ -150,7 +150,7 @@ export default function QuizJoinPage() {
             Question {question.index + 1} of {question.total}
           </p>
           <h1 className="mt-2 text-lg font-semibold text-slate-900">{question.text}</h1>
-          <p className="mt-2 text-2xl font-bold text-indigo-600">{secondsLeft}s</p>
+          <p className="mt-2 text-2xl font-bold text-orange-600">{secondsLeft}s</p>
 
           <div className="mt-6 space-y-2">
             {question.options.map((option, index) => (
@@ -160,8 +160,8 @@ export default function QuizJoinPage() {
                 disabled={selectedOption !== null}
                 className={`w-full rounded-xl border px-4 py-3 text-left text-sm transition ${
                   selectedOption === index
-                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                    : 'border-slate-200 text-slate-700 hover:border-indigo-300 disabled:hover:border-slate-200'
+                    ? 'border-orange-500 bg-orange-50 text-orange-700'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-orange-300 disabled:hover:border-slate-200'
                 }`}
               >
                 {option}
@@ -188,7 +188,7 @@ export default function QuizJoinPage() {
           <h1 className="text-xl font-semibold text-slate-900">Quiz finished!</h1>
           {me ? (
             <>
-              <p className="mt-4 text-4xl font-bold text-indigo-600">{me.score}</p>
+              <p className="mt-4 text-4xl font-bold text-orange-600">{me.score}</p>
               <p className="mt-1 text-sm text-slate-500">points{rank ? ` · rank #${rank}` : ''}</p>
             </>
           ) : null}

@@ -107,7 +107,7 @@ export default function SurveyRespondPage() {
                     value={answers[index] || ''}
                     onChange={(event) => setAnswer(index, event.target.value)}
                     placeholder="Your answer"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-400"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-400"
                   />
                 ) : question.type === 'long_text' ? (
                   <textarea
@@ -115,7 +115,7 @@ export default function SurveyRespondPage() {
                     value={answers[index] || ''}
                     onChange={(event) => setAnswer(index, event.target.value)}
                     placeholder="Your answer"
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 outline-none focus:border-indigo-400"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-orange-400"
                   />
                 ) : question.type === 'multiple_choice' ? (
                   <div className="space-y-2">
@@ -140,8 +140,8 @@ export default function SurveyRespondPage() {
                         onClick={() => setAnswer(index, String(n))}
                         className={`flex h-9 w-9 items-center justify-center rounded-full border text-sm font-medium transition ${
                           answers[index] === String(n)
-                            ? 'border-indigo-500 bg-indigo-500 text-white'
-                            : 'border-slate-200 text-slate-500 hover:border-indigo-300'
+                            ? 'border-orange-500 bg-orange-500 text-white'
+                            : 'border-slate-200 bg-white text-slate-500 hover:border-orange-300'
                         }`}
                       >
                         {n}
@@ -157,7 +157,7 @@ export default function SurveyRespondPage() {
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="mt-8 w-full rounded-full bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-8 w-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-3 text-sm font-semibold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? 'Submitting…' : 'Submit'}
         </button>
