@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon, EnvelopeClosedIcon, LockClosedIcon, EyeOpenIcon, EyeClosedIcon, PersonIcon, QuoteIcon } from '@radix-ui/react-icons';
@@ -9,13 +9,23 @@ const MotionLink = motion(Link);
 
 export default function SignUpPage() {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { user, signUp } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Wait for the AuthContext `user` state to actually commit before navigating —
+  // navigating in the same tick as signUp() raced against RequireAuth's check,
+  // which sometimes saw a stale `null` user and bounced back to /signin.
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -31,7 +41,6 @@ export default function SignUpPage() {
     setLoading(true);
     try {
       await signUp(name, email, password);
-      navigate('/dashboard');
     } catch (err: any) {
       setError(err?.response?.data?.error || 'Failed to create an account.');
     } finally {
@@ -90,7 +99,7 @@ export default function SignUpPage() {
           ) : null}
 
           <div className="mt-5">
-            <GoogleSignInButton theme="outline" onSuccess={() => navigate('/dashboard')} onError={setError} />
+            <GoogleSignInButton theme="outline" onSuccess={() => {}} onError={setError} />
           </div>
 
           <div className="my-4 flex items-center gap-3 text-xs uppercase tracking-wide text-slate-400">

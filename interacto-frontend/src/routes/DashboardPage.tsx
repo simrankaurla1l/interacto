@@ -72,6 +72,7 @@ export default function DashboardPage() {
   const [toast, setToast] = useState<string | null>(null);
 
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [desktopNoticeOpen, setDesktopNoticeOpen] = useState(false);
   const [surveyWizardOpen, setSurveyWizardOpen] = useState(false);
   const [quizWizardOpen, setQuizWizardOpen] = useState(false);
   const [presentations, setPresentations] = useState<Presentation[]>([]);
@@ -139,10 +140,25 @@ export default function DashboardPage() {
     fetchQuizzes();
   }, [quizWizardOpen]);
 
+  const isMobileViewport = () => typeof window !== 'undefined' && window.innerWidth < 1024;
+
   const openWizard = (key: (typeof createOptions)[number]['key']) => {
+    if (key === 'interactive' && isMobileViewport()) {
+      setDesktopNoticeOpen(true);
+      return;
+    }
     if (key === 'interactive') setWizardOpen(true);
     if (key === 'survey') setSurveyWizardOpen(true);
     if (key === 'quiz') setQuizWizardOpen(true);
+  };
+
+  const viewPresentation = (event: React.MouseEvent, id: string) => {
+    if (isMobileViewport()) {
+      event.preventDefault();
+      setDesktopNoticeOpen(true);
+      return;
+    }
+    navigate(`/editor/${id}`);
   };
 
   const performDelete = async () => {
@@ -213,7 +229,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen overflow-x-hidden bg-white">
       <aside className="sticky top-0 z-40 flex h-screen w-20 flex-shrink-0 flex-col overflow-visible border-r border-orange-100 bg-gradient-to-b from-orange-50/50 via-white to-white">
         <Link to="/" className="flex items-center justify-center px-0 py-6">
           <motion.span
@@ -321,11 +337,11 @@ export default function DashboardPage() {
         ) : null}
       </aside>
 
-      <div className="relative flex h-screen flex-1 flex-col overflow-y-auto">
+      <div className="relative flex h-screen min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
         <div className="pointer-events-none absolute -top-24 right-0 -z-10 h-72 w-72 rounded-full bg-sky-100/50 blur-3xl" />
         <div className="pointer-events-none absolute left-1/3 top-96 -z-10 h-72 w-72 rounded-full bg-fuchsia-100/40 blur-3xl" />
 
-        <main className="flex w-full flex-1 flex-col px-4 py-3 pb-24 lg:pb-3">
+        <main className="flex w-full min-w-0 flex-1 flex-col px-4 py-3 pb-24 lg:pb-3">
           <AnimatePresence mode="wait">
             <motion.div
               key={view}
@@ -349,9 +365,9 @@ export default function DashboardPage() {
                         'radial-gradient(circle at 12% 15%, rgba(251,146,60,0.25) 0%, transparent 45%), radial-gradient(circle at 88% 25%, rgba(251,191,36,0.25) 0%, transparent 45%), linear-gradient(180deg, #fff7ed 0%, #ffffff 100%)'
                     }}
                   >
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm">
+                    <div className="mx-auto inline-flex max-w-full items-center gap-1.5 whitespace-normal rounded-full border border-orange-200 bg-white px-3 py-1 text-center text-[11px] font-semibold text-slate-700 shadow-sm sm:text-xs">
                       The Future Of Interactive Content
-                      <StarFilledIcon className="h-3 w-3 text-orange-400" />
+                      <StarFilledIcon className="h-3 w-3 flex-shrink-0 text-orange-400" />
                     </div>
 
                     <h2 className="relative mx-auto mt-6 max-w-2xl text-xl font-bold leading-tight text-slate-900 sm:text-2xl">
@@ -464,27 +480,33 @@ export default function DashboardPage() {
                   loading={loadingPresentations}
                   empty={presentations.length === 0}
                   emptyLabel="No presentations yet."
-                  onCreate={() => setWizardOpen(true)}
+                  onCreate={() => openWizard('interactive')}
                   createLabel="Create a presentation"
                 >
                   <thead>
                     <tr className="border-b border-amber-100 bg-gradient-to-r from-orange-500 to-amber-400 text-xs font-semibold uppercase tracking-wide text-white">
                       <th className="px-3 py-4 sm:px-5">Title</th>
-                      <th className="px-3 py-4 sm:px-5">Topic</th>
-                      <th className="px-3 py-4 sm:px-5">Slides</th>
+                      <th className="hidden px-3 py-4 sm:table-cell sm:px-5">Topic</th>
+                      <th className="hidden px-3 py-4 sm:table-cell sm:px-5">Slides</th>
                       <th className="px-3 py-4 sm:px-5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {presentations.map((presentation) => (
                       <tr key={presentation._id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60">
-                        <td className="px-3 py-4 sm:px-5 text-xs font-semibold text-slate-900">{presentation.title}</td>
-                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{presentation.topic}</td>
-                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{presentation.slides.length}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs font-semibold text-slate-900">
+                          {presentation.title}
+                          <p className="mt-0.5 truncate text-[10px] font-normal text-slate-400 sm:hidden">
+                            {presentation.topic} · {presentation.slides.length} slides
+                          </p>
+                        </td>
+                        <td className="hidden px-3 py-4 sm:table-cell sm:px-5 text-xs text-slate-500">{presentation.topic}</td>
+                        <td className="hidden px-3 py-4 sm:table-cell sm:px-5 text-xs text-slate-500">{presentation.slides.length}</td>
                         <td className="px-3 py-4 sm:px-5">
                           <div className="flex items-center justify-end gap-2">
                             <Link
                               to={`/editor/${presentation._id}`}
+                              onClick={(event) => viewPresentation(event, presentation._id)}
                               aria-label="View presentation"
                               className="rounded-full border border-slate-200 p-1.5 text-slate-400 transition hover:border-slate-400 hover:text-slate-700"
                             >
@@ -525,19 +547,24 @@ export default function DashboardPage() {
                   <thead>
                     <tr className="border-b border-amber-100 bg-gradient-to-r from-orange-500 to-amber-400 text-xs font-semibold uppercase tracking-wide text-white">
                       <th className="px-3 py-4 sm:px-5">Title</th>
-                      <th className="px-3 py-4 sm:px-5">Audience</th>
-                      <th className="px-3 py-4 sm:px-5">Questions</th>
-                      <th className="px-3 py-4 sm:px-5">Responses</th>
+                      <th className="hidden px-3 py-4 sm:table-cell sm:px-5">Audience</th>
+                      <th className="hidden px-3 py-4 sm:table-cell sm:px-5">Questions</th>
+                      <th className="hidden px-3 py-4 sm:table-cell sm:px-5">Responses</th>
                       <th className="px-3 py-4 sm:px-5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {surveys.map((survey) => (
                       <tr key={survey._id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60">
-                        <td className="px-3 py-4 sm:px-5 text-xs font-semibold text-slate-900">{survey.title}</td>
-                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{survey.audience}</td>
-                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{survey.questions.length}</td>
-                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{survey.responses?.length || 0}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs font-semibold text-slate-900">
+                          {survey.title}
+                          <p className="mt-0.5 truncate text-[10px] font-normal text-slate-400 sm:hidden">
+                            {survey.audience} · {survey.questions.length} questions · {survey.responses?.length || 0} responses
+                          </p>
+                        </td>
+                        <td className="hidden px-3 py-4 sm:table-cell sm:px-5 text-xs text-slate-500">{survey.audience}</td>
+                        <td className="hidden px-3 py-4 sm:table-cell sm:px-5 text-xs text-slate-500">{survey.questions.length}</td>
+                        <td className="hidden px-3 py-4 sm:table-cell sm:px-5 text-xs text-slate-500">{survey.responses?.length || 0}</td>
                         <td className="px-3 py-4 sm:px-5">
                           <div className="flex items-center justify-end gap-2">
                             <Link
@@ -582,21 +609,26 @@ export default function DashboardPage() {
                   <thead>
                     <tr className="border-b border-amber-100 bg-gradient-to-r from-orange-500 to-amber-400 text-xs font-semibold uppercase tracking-wide text-white">
                       <th className="px-3 py-4 sm:px-5">Title</th>
-                      <th className="px-3 py-4 sm:px-5">Audience</th>
-                      <th className="px-3 py-4 sm:px-5">Difficulty</th>
-                      <th className="px-3 py-4 sm:px-5">Questions</th>
-                      <th className="px-3 py-4 sm:px-5">Room</th>
+                      <th className="hidden px-3 py-4 sm:table-cell sm:px-5">Audience</th>
+                      <th className="hidden px-3 py-4 sm:table-cell sm:px-5">Difficulty</th>
+                      <th className="hidden px-3 py-4 sm:table-cell sm:px-5">Questions</th>
+                      <th className="hidden px-3 py-4 sm:table-cell sm:px-5">Room</th>
                       <th className="px-3 py-4 sm:px-5 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {quizzes.map((quiz) => (
                       <tr key={quiz._id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60">
-                        <td className="px-3 py-4 sm:px-5 text-xs font-semibold text-slate-900">{quiz.title}</td>
-                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{quiz.audience}</td>
-                        <td className="px-3 py-4 sm:px-5 text-xs capitalize text-slate-500">{quiz.difficulty}</td>
-                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{quiz.questions.length}</td>
-                        <td className="px-3 py-4 sm:px-5 text-xs text-slate-500">{quiz.roomCode}</td>
+                        <td className="px-3 py-4 sm:px-5 text-xs font-semibold text-slate-900">
+                          {quiz.title}
+                          <p className="mt-0.5 truncate text-[10px] font-normal capitalize text-slate-400 sm:hidden">
+                            {quiz.audience} · {quiz.difficulty} · {quiz.questions.length} questions · {quiz.roomCode}
+                          </p>
+                        </td>
+                        <td className="hidden px-3 py-4 sm:table-cell sm:px-5 text-xs text-slate-500">{quiz.audience}</td>
+                        <td className="hidden px-3 py-4 sm:table-cell sm:px-5 text-xs capitalize text-slate-500">{quiz.difficulty}</td>
+                        <td className="hidden px-3 py-4 sm:table-cell sm:px-5 text-xs text-slate-500">{quiz.questions.length}</td>
+                        <td className="hidden px-3 py-4 sm:table-cell sm:px-5 text-xs text-slate-500">{quiz.roomCode}</td>
                         <td className="px-3 py-4 sm:px-5">
                           <div className="flex items-center justify-end gap-2">
                             <Link
@@ -687,6 +719,43 @@ export default function DashboardPage() {
                   Delete
                 </button>
               </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {desktopNoticeOpen ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            onClick={() => setDesktopNoticeOpen(false)}
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              onClick={(event) => event.stopPropagation()}
+              className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl"
+            >
+              <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-orange-50 text-orange-600">
+                <MagicWandIcon className="h-5 w-5" />
+              </span>
+              <h3 className="mt-3 text-base font-bold text-slate-900">Best viewed on a bigger screen</h3>
+              <p className="mt-1.5 text-sm text-slate-500">
+                The presentation editor is built for desktop. Please switch to a larger screen to create
+                or edit presentations.
+              </p>
+              <button
+                onClick={() => setDesktopNoticeOpen(false)}
+                className="mt-6 w-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-105"
+              >
+                Got it
+              </button>
             </motion.div>
           </motion.div>
         ) : null}

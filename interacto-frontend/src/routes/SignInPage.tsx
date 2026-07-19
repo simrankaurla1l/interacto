@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon, EnvelopeClosedIcon, LockClosedIcon, EyeOpenIcon, EyeClosedIcon, QuoteIcon } from '@radix-ui/react-icons';
@@ -10,7 +10,7 @@ const MotionLink = motion(Link);
 export default function SignInPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn } = useAuth();
+  const { user, signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +18,16 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
 
   const from = (location.state as { from?: string } | null)?.from || '/dashboard';
+
+  // Wait for the AuthContext `user` state to actually commit before navigating —
+  // navigating in the same tick as signIn() raced against RequireAuth's check,
+  // which sometimes saw a stale `null` user and bounced back to /signin.
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -29,7 +39,6 @@ export default function SignInPage() {
     setLoading(true);
     try {
       await signIn(email, password);
-      navigate(from, { replace: true });
     } catch (err: any) {
       setError(err?.response?.data?.error || 'Failed to sign in.');
     } finally {
@@ -88,7 +97,7 @@ export default function SignInPage() {
           ) : null}
 
           <div className="mt-8">
-            <GoogleSignInButton theme="outline" onSuccess={() => navigate(from, { replace: true })} onError={setError} />
+            <GoogleSignInButton theme="outline" onSuccess={() => {}} onError={setError} />
           </div>
 
           <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wide text-slate-400">
