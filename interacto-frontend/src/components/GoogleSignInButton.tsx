@@ -20,9 +20,18 @@ export default function GoogleSignInButton({ onSuccess, onError, theme = 'filled
     const updateWidth = () => setWidth(container.getBoundingClientRect().width);
     updateWidth();
 
+    // Only watch for resizes while the layout is still settling (fonts/CSS loading).
+    // Once locked, later resizes (e.g. a scrollbar shift when Google's account picker
+    // opens) are ignored — otherwise they'd force `key` to change below, remounting
+    // the button mid sign-in and silently dropping the in-flight credential callback.
     const observer = new ResizeObserver(updateWidth);
     observer.observe(container);
-    return () => observer.disconnect();
+    const lockTimer = window.setTimeout(() => observer.disconnect(), 1000);
+
+    return () => {
+      window.clearTimeout(lockTimer);
+      observer.disconnect();
+    };
   }, []);
 
   const buttonWidth = Math.min(400, Math.max(200, Math.round(width)));
